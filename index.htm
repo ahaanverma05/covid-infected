@@ -1,0 +1,74 @@
+<html>
+<head>
+    <title>Covid Map</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet'/>
+    <style>
+        #map {
+    height: 86vh;
+    width: 100%;
+}
+tr, th, td, table {
+    border: 2px solid black;
+    font-family: sans-serif;
+    background: white;
+}
+body {
+    background-image: url("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/2/1/2");
+    background-repeat: no-repeat;
+    background-size: 100% 100vh;
+}
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Yellow</th>
+            <th>Red</th>
+            <th>Green</th>
+        </tr>
+        <tr>
+            <td>Less Than 100</td>
+            <td>More Than 100</td>
+            <td>Less Than 50</td>
+        </tr>
+    </table>
+    <div id='map'></div>
+</body>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY29sbG9ndXk5IiwiYSI6ImNrcDU4NGhidjA0dmEyb3NiZHZ4a2swZDcifQ.SXzUos7WHkVHakVLPHIFMg';
+var map = new mapboxgl.Map({
+container: 'map', // container ID
+style: 'mapbox://styles/mapbox/streets-v11', // style URL
+center: [-74.5, 40], // starting position [lng, lat]
+zoom: 9 // starting zoom
+});
+function covid() {
+    fetch("data.json")
+    .then(response => response.json())
+    .then(rsp => 
+           rsp.data.forEach(element => {
+               var latitude = element.latitude;
+               var longitude = element.longitude;
+               var name = element.name;
+               var mycolor;
+               if(element.infected < 100){
+                   mycolor = "#FFFF00";
+               }
+               if(element.infected > 100){
+                mycolor = "#FF0000";
+            }
+            if(element.infected < 50){
+                mycolor = "#00FF00";
+            }
+               new mapboxgl.Marker({
+                color: mycolor,
+                draggable: false
+                }).setLngLat([longitude, latitude])
+                .addTo(map);
+           })
+        )
+}
+covid()
+</script>
+</html>
